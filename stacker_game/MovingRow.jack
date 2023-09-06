@@ -1,0 +1,127 @@
+/** Implements the row that moves sideways. */
+
+class MovingRow {
+  field int x; // starting index for blocks
+  field int delay; // block moving speed. smaller value is faster
+  field int direction; // 1 = move right, -1 = move left
+  field int time; // counter used to determine when to move the blocks
+  static int blocks; // number of blocks in the row
+  field Array row;	 
+  static int diff; 
+  static int score;
+
+
+  constructor MovingRow new() {
+    let delay = 1000;
+    let time = 0;
+    let score = 0;
+    let direction = 1;
+    let row = Array.new(Constants.COLS());
+    do setRow(1, 3);
+    do setLevel(0, blocks);
+    return this;
+  }
+
+  method int mod(int a, int b){
+    var int q, r;
+    let q = a/b;
+    let r = a - q*b;
+    return r;
+  }
+
+  /** set the number of blocks (aBlocks) starting from index (offset) in the row */
+  method void setRow(int offset, int aBlocks) {
+    var int i;
+    let i = 0;
+    let x = offset;
+    let blocks = aBlocks;
+    
+    while (i < Constants.COLS()) {
+      if ((i > (x-1)) & (i < (x + blocks))) {
+        let row[i] = true;
+	let score = score + 1;
+      } else {
+        let row[i] = false;
+      }
+      let x = x;
+      let i = i + 1;
+    }
+    return;
+  }
+
+function int getscr(){
+   return score;
+}
+
+  method Array getRow() {
+    return row;
+  }
+
+function void setdiff(int a){
+   let diff = Keyboard.readInt("Are you sure?(press the same one again):");
+   return;
+}
+
+function int getdiff(){
+   return diff;
+}
+
+
+
+
+  /** sets the moving speed and block starting position according to the new level */
+  method void setLevel(int level, int aBlocks) {
+    do setDelay(level);
+    do setRow(2, aBlocks);
+    return;
+  }
+
+  /** set the speed of the blocks given a level */
+  method void setDelay(int level) {
+    if (level = 1) {
+      let delay = 700;
+    }
+
+    if ((level > 1) & (level < 10)) {
+      let delay = delay - (diff * 43);
+    }
+
+    if (level = 10) {
+      let delay = 300;
+    }
+
+    if (level > 10) {
+      let delay = delay - (diff * 25);
+    }
+
+    return;
+  }
+
+
+  /** determines whether to move the blocks and where to move them */
+  method void move() {
+    if (time < delay) {
+      let time = time + 1;
+      return;
+    } else {
+      let time = 0;
+    }
+
+    if (x = (Constants.COLS() - blocks)) {  
+      let x = -1; // start from left edge when reaching right edge      
+    }
+
+    if (x = 0) {
+      let direction = 1;
+    }  
+    
+  let x = x + direction;
+  do setRow(x, blocks);
+  return;
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+}
